@@ -90,8 +90,8 @@
 
             <div class="login__group grid">
                <div>
-                  <lable class="login__lable" for="login-email">邮箱</lable>
-                  <input type="email" placeholder="填写你的邮箱" id="login-email" class="login__input">
+                  <lable class="login__lable" for="login-tel">邮箱</lable>
+                  <input type="tel" placeholder="填写你的手机号码" id="login-tel" class="login__input">
                </div>
 
                <div>
@@ -102,7 +102,7 @@
 
             <div>
                <span class="login__signup">
-                  还没有账号? <a href="#" >注册</a>
+                  还没有账号? <div id="go-regist" class="go__regist">注册</div>
                </span>
 
                <a href="#" class="login__forgot">
@@ -113,6 +113,35 @@
          </form>
 
          <i class="ri-close-line login__close" id="login-close"></i>
+      </div>
+
+      <!--==================== REGIST ====================-->
+      <div class="regist grid" id="regist-content">
+         <form action="" class="regist__form grid">
+            <h3 class="regist_title">Regist</h3>
+
+            <div class="regist__group grid">
+               <div>
+                  <lable class="regist__lable" for="regist-tel">手机</lable>
+                  <input type="tel" placeholder="填写你的手机号码" id="regist-tel" class="regist__input">
+               </div>
+
+               <div>
+                  <lable class="regist__lable" for="regist-pass">密码</lable>
+                  <input type="password" placeholder="输入密码" id="regist-pass" class="regist__input">
+               </div>
+            </div>
+
+            <div>
+               <span class="regist__login">
+                  已有账号? <div id="go-login" class="go__login">登录</div>
+               </span>
+
+               <button type="submit" class="regist__button button">登录</button>
+            </div>
+         </form>
+
+         <i class="ri-close-line regist__close" id="regist-close"></i>
       </div>
 
       <!--==================== MAIN ====================-->

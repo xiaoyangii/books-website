@@ -20,7 +20,8 @@ if(searchClose) {
 /*=============== LOGIN ===============*/
 const loginButton = document.getElementById('login-button'),
       loginClose = document.getElementById('login-close'),
-      loginContent = document.getElementById('login-content')
+      loginContent = document.getElementById('login-content'),
+      goRegist  = document.getElementById('go-regist')
 
 /*=============== LOGIN SHOW ===============*/
 if(loginButton) {
@@ -33,6 +34,35 @@ if(loginButton) {
 if(loginClose) {
   loginClose.addEventListener('click', () => {
     loginContent.classList.remove('show-login')
+  })
+}
+
+/*=============== LOGIN TO REGIST  REGIST SHOW ===============*/
+if(goRegist) {
+  goRegist.addEventListener('click', () => {
+    loginContent.classList.remove('show-login')
+    registContent.classList.add('show-regist')
+  })
+}
+
+/*=============== REGIST ===============*/
+const registButton = document.getElementById('regist-button'),
+      registClose = document.getElementById('regist-close'),
+      registContent = document.getElementById('regist-content'),
+      goLogin  = document.getElementById('go-login')
+
+/*=============== REGIST TO LOGIN ===============*/
+if(goLogin) {
+  goLogin.addEventListener('click', () => {
+    registContent.classList.remove('show-regist')
+    loginContent.classList.add('show-login')
+  })
+}
+
+/*=============== REGIST HIDDEN ===============*/
+if(registClose) {
+  registClose.addEventListener('click', () => {
+    registContent.classList.remove('show-regist')
   })
 }
 

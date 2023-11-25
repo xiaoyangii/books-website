@@ -317,7 +317,7 @@ body.dark-theme {
 }
 
 /*=============== LOGIN ===============*/
-.login {
+.login, .regist {
   position: fixed;
   top: -100%;
   left: 0;
@@ -332,7 +332,7 @@ body.dark-theme {
   transition: top .4s;
 }
 
-.login__form {
+.login__form, .regist__form {
   background-color: var(--container-color);
   padding: 2rem 1.5rem;
   border: 0.1vw solid var(--border-color);
@@ -342,15 +342,15 @@ body.dark-theme {
   margin: 0 auto;
 }
 
-.login__title {
+.login__title, .regist__title {
   font-size: var(--h2-font-size);
 }
 
-.login__group {
+.login__group, .regist__group {
   row-gap: 1.25rem;
 }
 
-.login__label {
+.login__label, .regist__label {
   display: block;
   text-align: initial;
   color: var(--title-color);
@@ -358,7 +358,7 @@ body.dark-theme {
   margin-bottom: .25rem;
 }
 
-.login__input {
+.login__input, .regist__input {
   width: 100%;
   background-color: var(--container-color);
   border: 0.1vw solid var(--border-color);
@@ -367,18 +367,28 @@ body.dark-theme {
 }
 
 .login__signup,
-.login__forgot {
+.login__forgot,
+.regist__login {
   display: block;
   font-style: var(--small-font-size);
 }
 
-.login__signup {
+.login__signup, .regist__login {
   margin-bottom: .5rem;
 }
 
-.login__signup a {
+.go__regist {
+  display: inline-block;
   color: var(--first-color);
   font-weight: var(--font-medium);
+  cursor: pointer;
+}
+
+.go__login {
+  display: inline-block;
+  color: var(--first-color);
+  font-weight: var(--font-medium);
+  cursor: pointer;
 }
 
 .login__forgot {
@@ -386,12 +396,12 @@ body.dark-theme {
   margin-bottom: 1.25rem;
 }
 
-.login__button {
+.login__button, .regist__button {
   width: 100%;
   cursor: pointer;
 }
 
-.login__close {
+.login__close, .regist__close {
   position: absolute;
   top: 2rem;
   right: 2rem;
@@ -402,6 +412,11 @@ body.dark-theme {
 
 /* Show login */
 .show-login {
+  top: 0;
+}
+
+/* Show regist */
+.show-regist {
   top: 0;
 }
 
