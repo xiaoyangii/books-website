@@ -1,3 +1,5 @@
+
+
 /*=============== SEARCH ===============*/
 const searchButton = document.getElementById('search-button'),
       searchClose = document.getElementById('search-close'),
@@ -220,9 +222,9 @@ const sr = ScrollReveal({
   reset: true //Animations will repeat
 })
 
-sr.reveal(`.home__data, .featured__container, .new__container, 
-           .join__data, .author__container, .footer`)
-sr.reveal(`.home__images`, { delay: 600 })
-sr.reveal(`.services__card`, { interval: 600 })
-sr.reveal(`.discount__data`, { origin: 'left' })
-sr.reveal(`.discount__images`, { origin: 'right' })
+// sr.reveal(`.home__data, .featured__container, .new__container, 
+//            .join__data, .author__container, .footer`)
+// sr.reveal(`.home__images`, { delay: 600 })
+// sr.reveal(`.services__card`, { interval: 600 })
+// sr.reveal(`.discount__data`, { origin: 'left' })
+// sr.reveal(`.discount__images`, { origin: 'right' })

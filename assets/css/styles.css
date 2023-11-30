@@ -531,14 +531,13 @@ body.dark-theme {
   margin-bottom: 1.25rem;
 }
 
-.featured__discount {
+.featured__categorylabel {
   color: var(--title-color);
 }
 
-.featured__price {
+/* .featured__category {
   font-size: var(--small-font-size);
-  text-decoration: line-through;
-}
+} */
 
 .featured__card .button {
   cursor: pointer;
@@ -581,6 +580,28 @@ body.dark-theme {
   font-size: 1.5rem;
   color: var(--first-color);
   transition: border .4s background-color .4s !important;
+}
+
+/*=============== btn ===============*/
+
+.btnbox {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+.add {
+  background-color: green;
+}
+.delete {
+  background-color: red;
+}
+.watch {
+  background-color: gray;
+}
+.update {
+  margin-top: 1rem;
 }
 
 /*=============== DISCOUNT ===============*/
