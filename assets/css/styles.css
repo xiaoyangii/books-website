@@ -581,7 +581,13 @@ body.dark-theme {
   color: var(--first-color);
   transition: border .4s background-color .4s !important;
 }
-
+/*=============== el-dialog ===============*/
+.el-dialog {
+  width: 70% !important;
+}
+.el-input {
+  width: 80% !important;
+}
 /*=============== btn ===============*/
 
 .btnbox {
@@ -677,10 +683,9 @@ body.dark-theme {
   color: var(--title-color);
 }
 
-.new__price {
+/* .new__price {
   font-size: var(--small-font-size);
-  text-decoration: line-through;
-}
+} */
 
 .new_stars {
   color: var(--first-color);

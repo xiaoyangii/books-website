@@ -15,6 +15,9 @@
 
       <!--=============== CSS ===============-->
       <link rel="stylesheet" href="assets/css/styles.css">
+
+      <!-- 引入样式 -->
+      <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
       
       <title>图书借阅管理系统</title>
    </head>
@@ -188,7 +191,7 @@
             </section>
 
             <!--==================== SERVICES ====================-->
-            <!-- <section class="services section">
+            <section class="services section">
                <div class="services__container container grid">
                   <article class="services__card">
                      <i class="ri-truck-line"></i>
@@ -208,7 +211,7 @@
                      <p class="services__description">Call us anytime</p>
                   </article>
                </div>
-            </section> -->
+            </section>
 
             <!--==================== FEATURED ====================-->
             <section class="featured section" id="featured">
@@ -216,13 +219,13 @@
                   Featured Books
                </h2>
                <div class="btnbox">
-                  <button class="button add">Add</button>
+                  <button class="button add" @click="addBook()">Add</button>
                </div>
                <div class="featured__container container">
                   <div class="featured__swiper swiper">
                      <div class="swiper-wrapper">
                         <article class="featured__card swiper-slide" v-for="(book, index) in books" :key="book.id">
-                           <img :src="book.img" alt="image" class="featured__img">
+                           <img :src=`assets/img/book-${book.id%11+1}.png` alt="image" class="featured__img">
                            
                            <h2 class="featured__title">{{ book.name }}</h2>
                            <div class="featured__categorys">
@@ -230,9 +233,9 @@
                               <span class="featured__category">{{ book.category }}</span>
                            </div>
                            <div class="btnbox">
-                              <button class="button watch">Watch</button>
-                              <button class="button delete">Delete</button>
-                              <button class="button update">Update</button>
+                              <button class="button watch" @click="openTable">Watch</button>
+                              <button class="button delete" @click="deleteBook(book.id)">Delete</button>
+                              <button class="button update" @click="updateBook(book.id)">Update</button>
                            </div>
                            <div class="featured__actions">
                               <button><i class="ri-search-line"></i></button>
@@ -250,6 +253,98 @@
                      </div>
                   </div>
                </div>
+               <el-dialog title="书本信息" :visible.sync="watchTableVisible">
+                  <el-table :data="books" stripe fit>
+                    <el-table-column property="id" label="BookID"></el-table-column>
+                    <el-table-column property="name" label="Title"></el-table-column>
+                    <el-table-column property="AuthorID" label="AuthorID"></el-table-column>
+                    <el-table-column property="PublisherID" label="PublisherID"></el-table-column>
+                    <el-table-column property="PublicationYear" label="PublicationYear"></el-table-column>
+                    <el-table-column property="category" label="Category"></el-table-column>
+                    <el-table-column property="IsBorrowed" label="IsBorrowed"></el-table-column>
+                    <el-table-column property="BorrowedCounts" label="BorrowedCounts"></el-table-column>
+                    <el-table-column property="Description" label="Description"></el-table-column>
+                  </el-table>
+               </el-dialog>
+               <el-dialog title="书本信息修改" :visible.sync="updateFormVisible">
+                  <el-form :model="updateForm" label-position="right" label-width="150px">
+                     <el-form-item label="Title">
+                        <el-input v-model="updateForm.Title" autocomplete="off"></el-input>
+                     </el-form-item>
+                     <el-form-item label="AuthorID">
+                        <el-input v-model.number="updateForm.AuthorID" autocomplete="off"></el-input>
+                     </el-form-item>
+                     <el-form-item label="PublisherID">
+                        <el-input v-model.number="updateForm.PublisherID" autocomplete="off"></el-input>
+                     </el-form-item>
+                     <el-form-item label="PublicationYear">
+                        <el-date-picker v-model="updateForm.PublicationYear" value-format="yyyy" type="year" placeholder="选出版年份">
+                      </el-date-picker>
+                     </el-form-item>
+                     <el-form-item label="Category">
+                        <el-select v-model="updateForm.Category" clearable placeholder="请选择分类">
+                           <el-option
+                             v-for="item in categoryOptions"
+                             :key="item.value"
+                             :label="item.label"
+                             :value="item.value">
+                           </el-option>
+                        </el-select>
+                     </el-form-item>
+                     <el-form-item label="IsBorrowed">
+                        <el-radio v-model="updateForm.IsBorrowed" label="0">未借出</el-radio>
+                        <el-radio v-model="updateForm.IsBorrowed" label="1">已借出</el-radio>
+                     </el-form-item>
+                     <el-form-item label="Description">
+                        <el-input type="textarea" v-model="updateForm.Description" autocomplete="off"></el-input>
+                     </el-form-item>
+                  </el-form>
+                  <div slot="footer" class="dialog-footer">
+                     <el-button @click="updateFormVisible = false;updateBookId = ''">取 消</el-button>
+                     <el-button type="primary" @click="updateBookConfirm()">确 定</el-button>
+                  </div>
+               </el-dialog>
+               <el-dialog title="新增书本" :visible.sync="addFormVisible">
+                  <el-form :model="addForm" label-position="right" label-width="150px">
+                     <el-form-item label="BookID">
+                        <el-input v-model.number="addForm.BookID" autocomplete="off"></el-input>
+                     </el-form-item>
+                     <el-form-item label="Title">
+                        <el-input v-model="addForm.Title" autocomplete="off"></el-input>
+                     </el-form-item>
+                     <el-form-item label="AuthorID">
+                        <el-input v-model.number="addForm.AuthorID" autocomplete="off"></el-input>
+                     </el-form-item>
+                     <el-form-item label="PublisherID">
+                        <el-input v-model.number="addForm.PublisherID" autocomplete="off"></el-input>
+                     </el-form-item>
+                     <el-form-item label="PublicationYear">
+                        <el-date-picker v-model="addForm.PublicationYear" value-format="yyyy" type="year" placeholder="选出版年份">
+                      </el-date-picker>
+                     </el-form-item>
+                     <el-form-item label="Category">
+                        <el-select v-model="addForm.Category" clearable placeholder="请选择分类">
+                           <el-option
+                             v-for="item in categoryOptions"
+                             :key="item.value"
+                             :label="item.label"
+                             :value="item.value">
+                           </el-option>
+                        </el-select>
+                     </el-form-item>
+                     <el-form-item label="IsBorrowed">
+                        <el-radio v-model="addForm.IsBorrowed" label="0">未借出</el-radio>
+                        <el-radio v-model="addForm.IsBorrowed" label="1">已借出</el-radio>
+                     </el-form-item>
+                     <el-form-item label="Description">
+                        <el-input type="textarea" v-model="addForm.Description" autocomplete="off"></el-input>
+                     </el-form-item>
+                  </el-form>
+                  <div slot="footer" class="dialog-footer">
+                     <el-button @click="addFormVisible = false;">取 消</el-button>
+                     <el-button type="primary" @click="addBookConfirm()">确 定</el-button>
+                  </div>
+               </el-dialog>
             </section>
 
             <!--==================== DISCOUNT ====================-->
@@ -257,17 +352,17 @@
                <div class="discount__container container grid">
                   <div class="discount__data">
                      <h2 class="discount__title section__title">
-                        Up To 50% Discount
+                        Enjoy It!
                      </h2>
       
                      <p class="discount__description">
-                        Take advantage of the discount days we 
-                        have for you, buy books from your favorite 
-                        writers, the more you buy, the more 
-                        discounts we have for you.
+                        Take advantage of the reading days we 
+                        have for you, read books from your favorite 
+                        writers, the more you read, the more 
+                        enjoy we have for you.
                      </p>
       
-                     <a href="#" class="button">Shop Now</a>
+                     <a href="#" class="button">Enjoy Now</a>
                   </div>
 
                   <div class="discount__images">
@@ -292,8 +387,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">小说</span>
                               </div>
       
                               <div class="new__stars">
@@ -312,8 +407,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">散文</span>
                               </div>
       
                               <div class="new__stars">
@@ -332,8 +427,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">散文集</span>
                               </div>
       
                               <div class="new__stars">
@@ -352,8 +447,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">小说</span>
                               </div>
       
                               <div class="new__stars">
@@ -372,8 +467,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">小说</span>
                               </div>
       
                               <div class="new__stars">
@@ -392,8 +487,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">小说</span>
                               </div>
       
                               <div class="new__stars">
@@ -412,8 +507,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">散文集</span>
                               </div>
       
                               <div class="new__stars">
@@ -432,8 +527,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">散文</span>
                               </div>
       
                               <div class="new__stars">
@@ -452,8 +547,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">散文</span>
                               </div>
       
                               <div class="new__stars">
@@ -472,8 +567,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">散文</span>
                               </div>
       
                               <div class="new__stars">
@@ -496,8 +591,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">小说</span>
                               </div>
       
                               <div class="new__stars">
@@ -516,8 +611,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">小说</span>
                               </div>
       
                               <div class="new__stars">
@@ -536,8 +631,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">小说</span>
                               </div>
       
                               <div class="new__stars">
@@ -556,8 +651,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">小说</span>
                               </div>
       
                               <div class="new__stars">
@@ -576,8 +671,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">小说</span>
                               </div>
       
                               <div class="new__stars">
@@ -596,8 +691,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">小说</span>
                               </div>
       
                               <div class="new__stars">
@@ -616,8 +711,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">小说</span>
                               </div>
       
                               <div class="new__stars">
@@ -636,8 +731,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">小说</span>
                               </div>
       
                               <div class="new__stars">
@@ -656,8 +751,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">小说</span>
                               </div>
       
                               <div class="new__stars">
@@ -676,8 +771,8 @@
                            <div>
                               <h2 class="new__title">New Book</h2>
                               <div class="new__prices">
-                                 <span class="new__discount">$7.99</span>
-                                 <span class="new__price">$14.99</span>
+                                 <span class="new__discount">类别:</span>
+                                 <span class="new__price">小说</span>
                               </div>
       
                               <div class="new__stars">
@@ -718,42 +813,38 @@
                <h2 class="section__title">
                   Reader Options
                </h2>
-
+               <div class="btnbox">
+                  <button class="button add" @click="addAuthor()">Add</button>
+               </div>
                <div class="author__container container">
                   <div class="author__swiper swiper">
                      <div class="swiper-wrapper">
-                        <article class="author__card swiper-slide">
-                           <img src="assets/img/testimonia-perfil-1.png" alt="image" class="author__img">
+                        <article class="author__card swiper-slide" v-for="author in authors" :key="author.AuthorID">
+                           <img :src=`assets/img/${author.AuthorName}.jpg` alt="image" class="author__img">
                         
-                           <h2 class="author__title">Rial Loz</h2>
-                           <p class="author__description">
-                              The best website to buy books, the purchase is
-                              very easy to make and has great discounts.
-                           </p>
-                        </article>
-
-                        <article class="author__card swiper-slide">
-                           <img src="assets/img/testimonia-perfil-2.png" alt="image" class="author__img">
-                        
-                           <h2 class="author__title">Rial Loz</h2>
-                           <p class="author__description">
-                              The best website to buy books, the purchase is
-                              very easy to make and has great discounts.
-                           </p>
-                        </article>
-
-                        <article class="author__card swiper-slide">
-                           <img src="assets/img/testimonia-perfil-3.png" alt="image" class="author__img">
-                        
-                           <h2 class="author__title">Rial Loz</h2>
-                           <p class="author__description">
-                              The best website to buy books, the purchase is
-                              very easy to make and has great discounts.
-                           </p>
+                           <h2 class="author__title">{{ author.AuthorName }}</h2>
+                           <p class="author__description">{{ author.ResearchArea }}</p>
                         </article>
                      </div>
                   </div>
                </div>
+               <el-dialog title="新增作者" :visible.sync="addFormVisible">
+                  <el-form :model="addForm" label-position="right" label-width="150px">
+                     <el-form-item label="AuthorID">
+                        <el-input v-model.number="author.AuthorID" autocomplete="off"></el-input>
+                     </el-form-item>
+                     <el-form-item label="AuthorName">
+                        <el-input v-model="author.AuthorName" autocomplete="off"></el-input>
+                     </el-form-item>
+                     <el-form-item label="ResearchArea">
+                        <el-input v-model="author.ResearchArea" autocomplete="off"></el-input>
+                     </el-form-item>
+                  </el-form>
+                  <div slot="footer" class="dialog-footer">
+                     <el-button @click="addFormVisible = false;">取 消</el-button>
+                     <el-button type="primary" @click="addAuthorConfirm()">确 定</el-button>
+                  </div>
+               </el-dialog>
             </section>
          </main>
 
@@ -860,6 +951,8 @@
          </a>
       </div>
       <script src="assets/js/vue.js"></script>
+      <!-- 引入组件库 -->
+      <script src="https://unpkg.com/element-ui/lib/index.js"></script>
       <!--=============== SCROLLREVEAL ===============-->
       <script src="assets/js/scrollreveal.min.js"></script>
       <!--=============== SWIPER JS ===============-->
@@ -873,21 +966,112 @@
             data: {
                seen: true,
                books: [
-                  { id: 1, category: '小说', name: 'book1', price: 10, img: 'assets/img/book-1.png'},
-                  { id: 2, category: '小说', name: 'book2', price: 11, img: 'assets/img/book-2.png'},
-                  { id: 3, category: '小说', name: 'book3', price: 12, img: 'assets/img/book-3.png'},
-                  { id: 4, category: '散文', name: 'book4', price: 13, img: 'assets/img/book-4.png'},
-                  { id: 5, category: '小说', name: 'book5', price: 13, img: 'assets/img/book-5.png'},
-                  { id: 6, category: '散文', name: 'book6', price: 13, img: 'assets/img/book-6.png'},
-               ]
+                  { id: 1, IsBorrowed: 0, category: '小说', name: 'book1', AuthorID: 10, img: 'assets/img/book-1.png'},
+                  { id: 2, IsBorrowed: 0, category: '小说', name: 'book2', AuthorID: 11, img: 'assets/img/book-2.png'},
+                  { id: 3, IsBorrowed: 0, category: '小说', name: 'book3', AuthorID: 12, img: 'assets/img/book-3.png'},
+                  { id: 4, IsBorrowed: 0, category: '散文', name: 'book4', AuthorID: 13, img: 'assets/img/book-4.png'},
+                  { id: 5, IsBorrowed: 0, category: '小说', name: 'book5', AuthorID: 13, img: 'assets/img/book-5.png'},
+                  { id: 6, IsBorrowed: 0, category: '散文', name: 'book6', AuthorID: 13, img: 'assets/img/book-6.png'},
+               ],
+               updateForm: {
+                  Title: '',
+                  AuthorID: '',
+                  PublisherID: '',
+                  PublicationYear: '',
+                  Category: '',
+                  IsBorrowed: '',
+                  Description: '',
+               },
+               categoryOptions: [{
+                  value: '小说',
+                  label: '小说'
+               }, {
+                  value: '散文',
+                  label: '散文'
+               }, {
+                  value: '散文集',
+                  label: '散文集'
+               }, {
+                  value: '诗歌',
+                  label: '诗歌'
+               }, {
+                  value: '戏剧',
+                  label: '戏剧'
+               }],
+               updateBookId: '',
+               addForm: {
+                  BookID: '',
+                  Title: '',
+                  AuthorID: '',
+                  PublisherID: '',
+                  PublicationYear: '',
+                  Category: '',
+                  IsBorrowed: '',
+                  Description: '',
+               },
+               watchTableVisible: false,
+               updateFormVisible: false,
+               addFormVisible: false,
+               formLabelWidth: '120px',
+               labelPosition: 'right',
+            },
+            methods: {
+               openTable() {
+                  this.watchTableVisible = true
+               },
+               deleteBook(id) {
+                  this.$confirm('此操作将永久删除该书本, 是否继续?', '提示', {
+                     confirmButtonText: '确定',
+                     cancelButtonText: '取消',
+                     type: 'warning'
+                  }).then(() => {
+                     //  deleteBook请求！！！！
+                     console.log(id)
+                     // this.books = this.books.filter(item => item.id !== id)
+                     this.$message({
+                        type: 'success',
+                        message: '删除成功!'
+                     })
+                  }).catch(() => {
+                     this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                     })          
+                  })
+               },
+               updateBook(id) {
+                  this.updateFormVisible = true
+                  this.updateBookId = id
+                  console.log(id)
+               },
+               updateBookConfirm() {
+                  // updateBook请求！！！！
+                  this.updateFormVisible = false
+                  this.updateBookId = ''
+                  this.$message({
+                     type: 'success',
+                     message: '修改成功!'
+                  })
+               },
+               addBook() {
+                  this.addFormVisible = true
+               },
+               addBookConfirm() {
+                  // addBook请求！！！！
+                  this.addFormVisible = false
+                  this.$message({
+                     type: 'success',
+                     message: '添加成功!'
+                  })
+               }
             },
             mounted() {
                let swiperFeatured = new Swiper('.featured__swiper', {
                   loop: false,
                   spaceBetween: 16,
                   grabCursor: true,
-                  // slidesPerView: 'auto',
-                  // centeredSlides: 'auto',
+                  slidesPerView: 'auto',
+                  centeredSlides: 'auto',
                   
                   navigation: {
                      nextEl: '.swiper-button-next',
@@ -895,12 +1079,12 @@
                   },
                   breakpoints: {
                      1150: {
-                        // slidesPerView: 4,
+                        slidesPerView: 4,
                         centeredSlides: false,
                      },
                   },
                })
-               sr.reveal(`.home__data, .featured__container, .new__container, .join__data, .author__container, .footer`)
+               sr.reveal(`.home__data, .featured__container, .new__container, .join__data, .footer`)
                sr.reveal(`.home__images`, { delay: 600 })
                sr.reveal(`.services__card`, { interval: 600 })
                sr.reveal(`.discount__data`, { origin: 'left' })
@@ -910,7 +1094,51 @@
                
             },
          })
-         
+         var app2 = new Vue({
+            el: '#author',
+            data: {
+               authors: [
+                  { AuthorID: 1, AuthorName: 'J.K. Rowling', ResearchArea: '小说家' },
+                  { AuthorID: 2, AuthorName: 'George Orwell', ResearchArea: '作家、新闻记者、社会评论家' },
+                  { AuthorID: 3, AuthorName: '鲁迅', ResearchArea: '作家、文学家、思想家、文化评论家' },
+               ],
+               author: {
+                  AuthorID: '',
+                  AuthorName: '',
+                  ResearchArea: '',
+               },
+               addFormVisible: false,
+            },
+            methods: {
+               addAuthor() {
+                  this.addFormVisible = true
+               },
+               addAuthorConfirm() {
+                  // addAuthor请求！！！！
+                  this.addFormVisible = false
+                  this.$message({
+                     type: 'success',
+                     message: '添加成功!'
+                  })
+               }
+            },
+            mounted() {
+               let swiperAuthor = new Swiper('.author__swiper', {
+                  loop: true,
+                  spaceBetween: 16,
+                  grabCursor: true,
+                  slidesPerView: 'auto',
+                  centeredSlides: 'auto',
+                  breakpoints: {
+                     1150: {
+                        slidesPerView: 3,
+                        centeredSlides: false,
+                     },
+                  },
+               })
+               sr.reveal(`.author__container`)
+            }
+         })
  
      </script>
    </body>
