@@ -44,9 +44,9 @@
                         </a>
                      </li>
                      <li class="nav__item">
-                        <a href="#discount" class="nav__link" title="作者">
-                           <i class="ri-user-3-line"></i>
-                           <span>作者</span>
+                        <a href="#discount" class="nav__link" title="其他">
+                           <i class="ri-inbox-unarchive-line"></i>
+                           <span>其他</span>
                         </a>
                      </li>
                      <li class="nav__item">
@@ -56,9 +56,9 @@
                         </a>
                      </li>
                      <li class="nav__item">
-                        <a href="#author" class="nav__link" title="借阅记录">
-                           <i class="ri-inbox-unarchive-line"></i>
-                           <span>借阅记录</span>
+                        <a href="#author" class="nav__link" title="作者">
+                           <i class="ri-user-3-line"></i>
+                           <span>作者</span>
                         </a>
                      </li>
                   </ul>
@@ -153,7 +153,7 @@
             <!--==================== HOME ====================-->
             <section class="home section" id="home">
                <div class="home__container container grid">
-                  <div class="home__data">
+                  <div class="home__data" id="borrowRecord">
                      <h1 class="home__title">
                         Browse & <br>
                         Select Books
@@ -163,7 +163,19 @@
                         从你最喜欢的作家那里找到最好的书籍，浏览数百本各种可能类别的书，享受阅读的乐趣。
                      </p>
 
-                     <a href="#featured" class="button">Explore Now</a>
+                     <button @click="openTable" class="button">BorrowRecords</button>
+                     <el-dialog title="借阅记录" :visible.sync="tableVisible">
+                        <el-table :data="borrowRecords" :header-cell-style="{'text-align':'center'}" :cell-style="{ 'text-align': 'center' }" stripe fit>
+                           <el-table-column property="RecordID" label="RecordID"></el-table-column>
+                           <el-table-column property="BookID" label="BookID"></el-table-column>
+                           <el-table-column property="BorrowDate" label="BorrowDate"></el-table-column>
+                           <el-table-column property="ReturnDate" label="ReturnDate"></el-table-column>
+                           <el-table-column property="DueDate" label="DueDate"></el-table-column>
+                           <el-table-column property="IsOverdue" label="IsOverdue"></el-table-column>
+                           <el-table-column property="UserID" label="UserID"></el-table-column>
+                           <el-table-column property="BorrowerName" label="BorrowerName"></el-table-column>
+                        </el-table>
+                     </el-dialog>
                   </div>
 
                   <div class="home__images">
@@ -218,24 +230,25 @@
                <h2 class="section__title">
                   Featured Books
                </h2>
-               <div class="btnbox">
+               <div class="btnbbox">
                   <button class="button add" @click="addBook()">Add</button>
+                  <button class="button watch" @click="openTable()">WatchAll</button>
                </div>
                <div class="featured__container container">
                   <div class="featured__swiper swiper">
                      <div class="swiper-wrapper">
-                        <article class="featured__card swiper-slide" v-for="(book, index) in books" :key="book.id">
-                           <img :src=`assets/img/book-${book.id%11+1}.png` alt="image" class="featured__img">
+                        <article class="featured__card swiper-slide" v-for="(book, index) in books" :key="book.BookID">
+                           <img :src=`assets/img/${book.Title}.jpg` alt="image" class="featured__img">
                            
-                           <h2 class="featured__title">{{ book.name }}</h2>
+                           <h2 class="featured__title">{{ book.Title }}</h2>
                            <div class="featured__categorys">
                               <span class="featured__categorylabel">类别:</span>
-                              <span class="featured__category">{{ book.category }}</span>
+                              <span class="featured__category">{{ book.Category }}</span>
                            </div>
                            <div class="btnbox">
-                              <button class="button watch" @click="openTable">Watch</button>
-                              <button class="button delete" @click="deleteBook(book.id)">Delete</button>
-                              <button class="button update" @click="updateBook(book.id)">Update</button>
+                              <button class="button watch" @click="openTable(book.BookID)">Watch</button>
+                              <button class="button delete" @click="deleteBook(book.BookID)">Delete</button>
+                              <button class="button update" @click="updateBook(book.BookID)">Update</button>
                            </div>
                            <div class="featured__actions">
                               <button><i class="ri-search-line"></i></button>
@@ -254,13 +267,13 @@
                   </div>
                </div>
                <el-dialog title="书本信息" :visible.sync="watchTableVisible">
-                  <el-table :data="books" stripe fit>
-                    <el-table-column property="id" label="BookID"></el-table-column>
-                    <el-table-column property="name" label="Title"></el-table-column>
+                  <el-table :data="book" :header-cell-style="{'text-align':'center'}" :cell-style="{ 'text-align': 'center' }" stripe fit>
+                    <el-table-column property="BookID" label="BookID"></el-table-column>
+                    <el-table-column property="Title" label="Title"></el-table-column>
                     <el-table-column property="AuthorID" label="AuthorID"></el-table-column>
                     <el-table-column property="PublisherID" label="PublisherID"></el-table-column>
                     <el-table-column property="PublicationYear" label="PublicationYear"></el-table-column>
-                    <el-table-column property="category" label="Category"></el-table-column>
+                    <el-table-column property="Category" label="Category"></el-table-column>
                     <el-table-column property="IsBorrowed" label="IsBorrowed"></el-table-column>
                     <el-table-column property="BorrowedCounts" label="BorrowedCounts"></el-table-column>
                     <el-table-column property="Description" label="Description"></el-table-column>
@@ -272,7 +285,7 @@
                         <el-input v-model="updateForm.Title" autocomplete="off"></el-input>
                      </el-form-item>
                      <el-form-item label="AuthorID">
-                        <el-input v-model.number="updateForm.AuthorID" autocomplete="off"></el-input>
+                        <el-input v-model="updateForm.AuthorID" autocomplete="off"></el-input>
                      </el-form-item>
                      <el-form-item label="PublisherID">
                         <el-input v-model.number="updateForm.PublisherID" autocomplete="off"></el-input>
@@ -292,8 +305,8 @@
                         </el-select>
                      </el-form-item>
                      <el-form-item label="IsBorrowed">
-                        <el-radio v-model="updateForm.IsBorrowed" label="0">未借出</el-radio>
-                        <el-radio v-model="updateForm.IsBorrowed" label="1">已借出</el-radio>
+                        <el-radio v-model="updateForm.IsBorrowed" label='0'>未借出</el-radio>
+                        <el-radio v-model="updateForm.IsBorrowed" label='1'>已借出</el-radio>
                      </el-form-item>
                      <el-form-item label="Description">
                         <el-input type="textarea" v-model="updateForm.Description" autocomplete="off"></el-input>
@@ -813,8 +826,9 @@
                <h2 class="section__title">
                   Reader Options
                </h2>
-               <div class="btnbox">
+               <div class="btnbbox">
                   <button class="button add" @click="addAuthor()">Add</button>
+                  <button class="button watch" @click="openTable()">WatchAll</button>
                </div>
                <div class="author__container container">
                   <div class="author__swiper swiper">
@@ -824,20 +838,25 @@
                         
                            <h2 class="author__title">{{ author.AuthorName }}</h2>
                            <p class="author__description">{{ author.ResearchArea }}</p>
+                           <div class="btnbox">
+                              <button class="button watch" @click="openTable(author.AuthorID)">Watch</button>
+                              <button class="button delete" @click="deleteAuthor(author.AuthorID)">Delete</button>
+                              <button class="button updateauthor" @click="updateAuthor(author.AuthorID)">Update</button>
+                           </div>
                         </article>
                      </div>
                   </div>
                </div>
                <el-dialog title="新增作者" :visible.sync="addFormVisible">
-                  <el-form :model="addForm" label-position="right" label-width="150px">
+                  <el-form :model="authorForm" label-position="right" label-width="150px">
                      <el-form-item label="AuthorID">
-                        <el-input v-model.number="author.AuthorID" autocomplete="off"></el-input>
+                        <el-input v-model.number="authorForm.AuthorID" autocomplete="off"></el-input>
                      </el-form-item>
                      <el-form-item label="AuthorName">
-                        <el-input v-model="author.AuthorName" autocomplete="off"></el-input>
+                        <el-input v-model="authorForm.AuthorName" autocomplete="off"></el-input>
                      </el-form-item>
                      <el-form-item label="ResearchArea">
-                        <el-input v-model="author.ResearchArea" autocomplete="off"></el-input>
+                        <el-input v-model="authorForm.ResearchArea" autocomplete="off"></el-input>
                      </el-form-item>
                   </el-form>
                   <div slot="footer" class="dialog-footer">
@@ -845,11 +864,35 @@
                      <el-button type="primary" @click="addAuthorConfirm()">确 定</el-button>
                   </div>
                </el-dialog>
+               <el-dialog title="作者信息" :visible.sync="watchTableVisible">
+                  <el-table :header-cell-style="{'text-align':'center'}" :cell-style="{ 'text-align': 'center' }" :data="author" stripe fit>
+                    <el-table-column property="AuthorID" label="AuthorID"></el-table-column>
+                    <el-table-column property="AuthorName" label="AuthorName"></el-table-column>
+                    <el-table-column property="ResearchArea" label="ResearchArea"></el-table-column>
+                  </el-table>
+               </el-dialog>
+               <el-dialog title="作者信息修改" :visible.sync="updateFormVisible">
+                  <el-form :model="updateForm" label-position="right" label-width="150px">
+                     <el-form-item label="AuthorID">
+                        <el-input v-model.number="updateForm.AuthorID" autocomplete="off"></el-input>
+                     </el-form-item>
+                     <el-form-item label="AuthorName">
+                        <el-input v-model="updateForm.AuthorName" autocomplete="off"></el-input>
+                     </el-form-item>
+                     <el-form-item label="ResearchArea">
+                        <el-input v-model="updateForm.ResearchArea" autocomplete="off"></el-input>
+                     </el-form-item>
+                  </el-form>
+                  <div slot="footer" class="dialog-footer">
+                     <el-button @click="updateFormVisible = false; updateAuthorID = '' ">取 消</el-button>
+                     <el-button type="primary" @click="updateAuthorConfirm()">确 定</el-button>
+                  </div>
+               </el-dialog>
             </section>
          </main>
 
          <!--==================== FOOTER ====================-->
-         <footer class="footer">
+         <footer class="footer" id="footer">
             <div class="footer__container container grid">
                <div>
                   <a href="#" class="footer__logo">
@@ -950,6 +993,7 @@
             <i class="ri-arrow-up-line"></i>
          </a>
       </div>
+      <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
       <script src="assets/js/vue.js"></script>
       <!-- 引入组件库 -->
       <script src="https://unpkg.com/element-ui/lib/index.js"></script>
@@ -964,15 +1008,11 @@
          var app1 = new Vue({
             el: '#featured',
             data: {
+               baseUrl: 'http://127.0.0.1:3000',
                seen: true,
                books: [
-                  { id: 1, IsBorrowed: 0, category: '小说', name: 'book1', AuthorID: 10, img: 'assets/img/book-1.png'},
-                  { id: 2, IsBorrowed: 0, category: '小说', name: 'book2', AuthorID: 11, img: 'assets/img/book-2.png'},
-                  { id: 3, IsBorrowed: 0, category: '小说', name: 'book3', AuthorID: 12, img: 'assets/img/book-3.png'},
-                  { id: 4, IsBorrowed: 0, category: '散文', name: 'book4', AuthorID: 13, img: 'assets/img/book-4.png'},
-                  { id: 5, IsBorrowed: 0, category: '小说', name: 'book5', AuthorID: 13, img: 'assets/img/book-5.png'},
-                  { id: 6, IsBorrowed: 0, category: '散文', name: 'book6', AuthorID: 13, img: 'assets/img/book-6.png'},
                ],
+               book: [],
                updateForm: {
                   Title: '',
                   AuthorID: '',
@@ -1016,21 +1056,59 @@
                labelPosition: 'right',
             },
             methods: {
-               openTable() {
+               openTable(id) {
                   this.watchTableVisible = true
+                  if(id) {
+                     this.book = []
+                     this.getBook(id)
+                  }
+               },
+               async getBook(id) {
+                  await axios.get(`${this.baseUrl}/book/${id}`)
+                  .then( res => {
+                     if(res.status === 200) {
+                        this.book = []
+                        this.book = res.data
+                     }
+                     console.log(res)
+                  })
+                  .catch( err => {
+                     console.log(err)
+                  })
+               },
+               async getBooks() {
+                  await axios.get(`${this.baseUrl}/book`)
+                  .then( res => {
+                     if(res.status === 200) {
+                        this.book = []
+                        this.books = res.data
+                        this.book = res.data
+                     }
+                     console.log(res)
+                  })
+                  .catch( err => {
+                     console.log(err)
+                  })
                },
                deleteBook(id) {
                   this.$confirm('此操作将永久删除该书本, 是否继续?', '提示', {
                      confirmButtonText: '确定',
                      cancelButtonText: '取消',
                      type: 'warning'
-                  }).then(() => {
-                     //  deleteBook请求！！！！
-                     console.log(id)
-                     // this.books = this.books.filter(item => item.id !== id)
-                     this.$message({
-                        type: 'success',
-                        message: '删除成功!'
+                  }).then(async() => {
+                     await axios.delete(`${this.baseUrl}/book/${id}`)
+                     .then( res => {
+                        if(res.status === 200) {
+                           this.books = this.books.filter(item => item.BookID !== id)
+                           this.$message({
+                              type: 'success',
+                              message: '删除成功!'
+                           })
+                        }
+                        console.log(res)
+                     })
+                     .catch( err => {
+                        console.log(err)
                      })
                   }).catch(() => {
                      this.$message({
@@ -1042,26 +1120,73 @@
                updateBook(id) {
                   this.updateFormVisible = true
                   this.updateBookId = id
-                  console.log(id)
+                  // 先将对应updateBookId的数据赋值给updateForm
+                  this.books.forEach(item => {
+                     if (item.BookID === this.updateBookId) {
+                        this.updateForm = item
+                        this.updateForm.PublicationYear = item.PublicationYear.toString()
+                        this.updateForm.IsBorrowed = item.IsBorrowed.toString()
+                     }
+                  })
                },
-               updateBookConfirm() {
-                  // updateBook请求！！！！
-                  this.updateFormVisible = false
-                  this.updateBookId = ''
-                  this.$message({
-                     type: 'success',
-                     message: '修改成功!'
+               async updateBookConfirm() {
+                  await axios.put(`${this.baseUrl}/book/${this.updateBookId}`, this.updateForm, {
+                     headers: {
+                        'Content-Type': 'application/json'
+                     }
+                  })
+                  .then( res => {
+                     if(res.status === 200) {
+                        this.$message({
+                           type: 'success',
+                           message: '修改成功!'
+                        })
+                        this.books.forEach(item => {
+                           if (item.BookID === this.updateBookId) {
+                              item = this.updateForm
+                           }
+                        })
+                        this.updateFormVisible = false
+                        this.updateBookId = ''
+                     }
+                     console.log(res)
+                  })
+                  .catch( err => {
+                     console.log(err)
                   })
                },
                addBook() {
                   this.addFormVisible = true
                },
-               addBookConfirm() {
-                  // addBook请求！！！！
-                  this.addFormVisible = false
-                  this.$message({
-                     type: 'success',
-                     message: '添加成功!'
+               async addBookConfirm() {
+                  await axios.post(`${this.baseUrl}/book`, this.addForm, {
+                     headers: {
+                        'Content-Type': 'application/json'
+                     }
+                  })
+                  .then( res => {
+                     if(res.status === 200) {
+                        this.books.push(this.addForm)
+                        this.addForm = {
+                           BookID: '',
+                           Title: '',
+                           AuthorID: '',
+                           PublisherID: '',
+                           PublicationYear: '',
+                           Category: '',
+                           IsBorrowed: '',
+                           Description: '',
+                        }
+                        this.$message({
+                           type: 'success',
+                           message: '添加成功!'
+                        })
+                        this.addFormVisible = false
+                     }
+                     console.log(res)
+                  })
+                  .catch( err => {
+                     console.log(err)
                   })
                }
             },
@@ -1084,43 +1209,165 @@
                      },
                   },
                })
-               sr.reveal(`.home__data, .featured__container, .new__container, .join__data, .footer`)
+               sr.reveal(`.featured__container, .new__container, .join__data, .footer`)
                sr.reveal(`.home__images`, { delay: 600 })
                sr.reveal(`.services__card`, { interval: 600 })
                sr.reveal(`.discount__data`, { origin: 'left' })
                sr.reveal(`.discount__images`, { origin: 'right' })
             },
             created() {
-               
+               this.getBooks()
             },
          })
          var app2 = new Vue({
             el: '#author',
             data: {
+               baseUrl: 'http://127.0.0.1:3000',
                authors: [
-                  { AuthorID: 1, AuthorName: 'J.K. Rowling', ResearchArea: '小说家' },
-                  { AuthorID: 2, AuthorName: 'George Orwell', ResearchArea: '作家、新闻记者、社会评论家' },
-                  { AuthorID: 3, AuthorName: '鲁迅', ResearchArea: '作家、文学家、思想家、文化评论家' },
                ],
-               author: {
+               author: [],
+               authorForm: {
                   AuthorID: '',
                   AuthorName: '',
                   ResearchArea: '',
                },
+               updateForm: {
+                  AuthorID: '',
+                  AuthorName: '',
+                  ResearchArea: '',
+               },
+               updateAuthorID: '',
                addFormVisible: false,
+               watchTableVisible: false,
+               updateFormVisible: false,
             },
             methods: {
+               openTable(id) {
+                  if(id) {
+                     this.author = []
+                     this.getAuthor(id)
+                  }
+                  this.watchTableVisible = true
+               },
+               async getAuthor(id) {
+                  await axios.get(`${this.baseUrl}/author/${id}`)
+                  .then( res => {
+                     if(res.status === 200) {
+                        this.author = res.data
+                     }
+                     console.log(res)
+                  })
+                  .catch( err => {
+                     console.log(err)
+                  })
+               },
+               async getAuthors() {
+                  await axios.get(`${this.baseUrl}/author`)
+                  .then( res => {
+                     if(res.status === 200) {
+                        this.authors = res.data
+                        this.author = res.data
+                     }
+                     console.log(res)
+                  })
+                  .catch( err => {
+                     console.log(err)
+                  })
+               },
                addAuthor() {
                   this.addFormVisible = true
                },
-               addAuthorConfirm() {
-                  // addAuthor请求！！！！
-                  this.addFormVisible = false
-                  this.$message({
-                     type: 'success',
-                     message: '添加成功!'
+               async addAuthorConfirm() {
+                  await axios.post(`${this.baseUrl}/author`, this.authorForm, {
+                     headers: {
+                        'Content-Type': 'application/json'
+                     }
+                  })
+                  .then( res => {
+                     if(res.status === 200) {
+                        this.authors.push(this.authorForm)
+                        this.authorForm = {
+                           AuthorID: '',
+                           AuthorName: '',
+                           ResearchArea: '',
+                        }
+                        this.$message({
+                           type: 'success',
+                           message: '添加成功!'
+                        })
+                     }
+                     console.log(res)
+                     this.addFormVisible = false
+                  })
+                  .catch( err => {
+                     console.log(err)
+                  })
+               },
+               deleteAuthor(id) {
+                  this.$confirm('此操作将永久删除该作者, 是否继续?', '提示', {
+                     confirmButtonText: '确定',
+                     cancelButtonText: '取消',
+                     type: 'warning'
+                  }).then(async() => {
+                     await axios.delete(`${this.baseUrl}/author/${id}`)
+                     .then(res => {
+                        if(res.status === 200) {
+                           this.$message({
+                              type: 'success',
+                              message: '删除成功!'
+                           })
+                           this.authors = this.authors.filter(item => item.AuthorID !== id)
+                        }
+                        console.log(res)
+                     })
+                     .catch(err => {
+                        console.log(err)
+                     })
+                  }).catch(() => {
+                     this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                     })          
+                  })
+               },
+               updateAuthor(id) {
+                  this.updateFormVisible = true
+                  this.updateAuthorID = id
+                  // 先将对应updateAuthorID的数据赋值给updateForm
+                  this.authors.forEach(item => {
+                     if (item.AuthorID === this.updateAuthorID) {
+                        this.updateForm = item
+                     }
+                  })
+               },
+               async updateAuthorConfirm() {
+                  await axios.put(`${this.baseUrl}/author/${this.updateAuthorID}`, this.updateForm, {
+                     headers: {
+                        'Content-Type': 'application/json'
+                     }
+                  })
+                  .then( res => {
+                     if(res.status === 200) {
+                        this.authors.forEach(item => {
+                           if (item.AuthorID === this.updateAuthorID) {
+                              item = this.updateForm
+                           }
+                        })
+                        this.updateFormVisible = false
+                        this.$message({
+                           type: 'success',
+                           message: '修改成功!'
+                        })
+                     }
+                     console.log(res)
+                  })
+                  .catch( err => {
+                     console.log(err)
                   })
                }
+            },
+            created() {
+               this.getAuthors()
             },
             mounted() {
                let swiperAuthor = new Swiper('.author__swiper', {
@@ -1139,7 +1386,42 @@
                sr.reveal(`.author__container`)
             }
          })
- 
+         var app3 = new Vue({
+            el: '#borrowRecord',
+            data: {
+               borrowRecords: [
+                  { RecordID: 1, BorrowerName: 'zkq', BookID: 1, BorrowDate: '2021-10-21', ReturnDate: '2021-10-30', DueDate: '2021-11-20', IsOverdue: 0, UserID: 1 },
+                  { RecordID: 2, BorrowerName: 'zkq', BookID: 2, BorrowDate: '2021-10-21', ReturnDate: '2021-10-30', DueDate: '2021-11-20', IsOverdue: 0, UserID: 2 },
+                  { RecordID: 3, BorrowerName: 'zkq', BookID: 3, BorrowDate: '2021-10-21', ReturnDate: '2021-10-30', DueDate: '2021-11-20', IsOverdue: 0, UserID: 3 },
+                  { RecordID: 4, BorrowerName: 'zkq', BookID: 4, BorrowDate: '2021-10-21', ReturnDate: '2021-10-30', DueDate: '2021-11-20', IsOverdue: 0, UserID: 4 },
+               ],
+               tableVisible: false,
+            },
+            mounted(){
+               let swiperHome = new Swiper('.home__swiper', {
+                  loop: true,
+                  spaceBetween: -24,
+                  grabCursor: true,
+                  slidesPerView: 'auto',
+                  centeredSlides: 'auto',
+                  autoplay: {
+                     delay: 3000,
+                     disableOnInteraction: false,
+                  },
+                  breakpoints: {
+                     1220: {
+                        spaceBetween: -32,
+                     },
+                  },
+               })
+               sr.reveal(`.home__data`)
+            },
+            methods: {
+               openTable() {
+                  this.tableVisible = true
+               }
+            },
+         })
      </script>
    </body>
 </html>

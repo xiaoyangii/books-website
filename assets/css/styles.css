@@ -227,6 +227,10 @@ body.dark-theme {
   transition: color .4s;
 }
 
+.tableBtn {
+  cursor: pointer;
+}
+
 .nav__link span {
   display: none;
 }
@@ -596,6 +600,13 @@ body.dark-theme {
   align-items: center;
   flex-wrap: wrap;
   margin-top: 1rem;
+}
+.btnbbox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+  gap: 1rem;
 }
 .add {
   background-color: green;
