@@ -587,7 +587,7 @@ body.dark-theme {
 }
 /*=============== el-dialog ===============*/
 .el-dialog {
-  width: 70% !important;
+  width: 75% !important;
 }
 .el-input {
   width: 80% !important;
@@ -610,15 +610,23 @@ body.dark-theme {
 }
 .add {
   background-color: green;
+  cursor: pointer;
 }
 .delete {
   background-color: red;
+  cursor: pointer;
 }
 .watch {
   background-color: gray;
+  cursor: pointer;
 }
 .update {
   margin-top: 1rem;
+  cursor: pointer;
+}
+.hot {
+  background-color: rgb(170, 0, 0);
+  cursor: pointer;
 }
 
 /*=============== DISCOUNT ===============*/
